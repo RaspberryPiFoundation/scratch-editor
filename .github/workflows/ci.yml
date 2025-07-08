@@ -3,7 +3,7 @@ name: CI
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   push: # Runs whenever a commit is pushed to the repository
-    branches: [experience-cs]
+    branches: [seb-experience-cs]
 
 permissions:
   packages: write # deploy to GitHub Packages
@@ -97,6 +97,6 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_VERSION="0.1.0-experience-cs.$(date +'%Y%m%d%H%M%S')"
+          RELEASE_VERSION="0.1.0-seb-experience-cs.$(date +'%Y%m%d%H%M%S')"
           npm version --no-git-tag-version $RELEASE_VERSION
           npm publish --access public --tag latest
