@@ -105,7 +105,7 @@ jobs:
         run: |
           RELEASE_VERSION="13.7.3-code-classroom.$(date +'%Y%m%d%H%M%S')"
           npm version --no-git-tag-version "$RELEASE_VERSION"
-          npm publish --access public --tag latest
+          npm publish --access public --tag latest --ignore-scripts
 
   test:
     name: Test
