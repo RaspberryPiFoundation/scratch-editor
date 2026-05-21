@@ -6,6 +6,67 @@ Scratch project by pressing "Create" on that website or by visiting <https://scr
 This is a source code repository for the packages that make up the Scratch editor and a few additional support
 packages. Use this if you'd like to learn about how the Scratch editor works or to contribute to its development.
 
+## Raspberry Pi Foundation fork (`code-classroom`)
+
+This repository is a public fork of [scratchfoundation/scratch-editor](https://github.com/scratchfoundation/scratch-editor), maintained for Code Classroom and related products. Modified source is published under AGPL-3.0; published npm packages should correspond to a specific commit on this repository.
+
+**Primary consumer:** this build is maintained for use with [editor-ui](https://github.com/RaspberryPiFoundation/editor-ui), which depends on `@RaspberryPiFoundation/scratch-gui` published from this repository.
+
+### Upstream anchor and integration branch
+
+| | |
+|---|---|
+| **Upstream anchor branch** | [`code-classroom-base`](https://github.com/RaspberryPiFoundation/scratch-editor/tree/code-classroom-base) — points at a [scratchfoundation/scratch-editor](https://github.com/scratchfoundation/scratch-editor) **release tag** only (no RPF packaging) |
+| **Upstream release** | [`v13.7.3`](https://github.com/scratchfoundation/scratch-editor/releases/tag/v13.7.3) (current tag on `code-classroom-base`) |
+| **Integration branch** | [`code-classroom`](https://github.com/RaspberryPiFoundation/scratch-editor/tree/code-classroom) — long-lived branch; RPF packaging, CI, and feature work merge here via PR |
+| **RPF changes (diff)** | [Compare `code-classroom` to `code-classroom-base`](https://github.com/RaspberryPiFoundation/scratch-editor/compare/code-classroom-base...code-classroom) — packaging, CI, and fork-only code |
+| **Published package** | [`@RaspberryPiFoundation/scratch-gui`](https://github.com/RaspberryPiFoundation/scratch-editor/pkgs/npm/scratch-gui) on GitHub Packages |
+
+`code-classroom` is based on the latest upstream **release tag** on `code-classroom-base`, plus RPF-specific packaging and CI.
+
+### Keeping `code-classroom` up to date with MIT
+
+We track [scratchfoundation/scratch-editor](https://github.com/scratchfoundation/scratch-editor) **release tags** (not `develop`). Pick the latest release from [GitHub Releases](https://github.com/scratchfoundation/scratch-editor/releases) when refreshing the fork.
+
+**`code-classroom-base`** holds the pure upstream snapshot. **`code-classroom`** holds RPF changes on top — see the [branch comparison](https://github.com/RaspberryPiFoundation/scratch-editor/compare/code-classroom-base...code-classroom) (or locally: `git diff code-classroom-base..code-classroom`). To adopt a newer MIT release, update `code-classroom-base` to the new tag, then integrate that bump into `code-classroom` via PR.
+
+#### Refresh `code-classroom-base` to a newer release tag
+
+Use the tag from [scratchfoundation/scratch-editor releases](https://github.com/scratchfoundation/scratch-editor/releases) (example: `v13.7.4-svg`):
+
+```bash
+git fetch mit --tags
+git checkout code-classroom-base
+git reset --hard v13.7.4-svg
+git push origin code-classroom-base --force-with-lease
+```
+
+### Local development
+
+Use the Node version in [`.nvmrc`](.nvmrc). Install dependencies from the **repository root**:
+
+```bash
+nvm install
+nvm use
+NODE_ENV=development npm ci
+npm run build
+```
+
+Root [`.npmrc`](.npmrc) routes the `@RaspberryPiFoundation` scope to GitHub Packages. This requires a Github access token with `read:packages` and `repo`.
+
+```bash
+cd packages/scratch-gui
+npm run test:lint
+npm run test:unit
+npm start   # http://localhost:8601/
+```
+
+### CI and publishing
+
+- **Pull requests:** CI runs build and tests; **no** package is published to GitHub Packages.
+- **Push to `code-classroom`:** CI builds and publishes `@RaspberryPiFoundation/scratch-gui` with a version such as `13.7.3-code-classroom.YYYYMMDDHHMMSS`. Pin an explicit version in consumers (e.g. editor-ui); do not rely on floating `latest` in production.
+- Publishing is configured in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (inline publish step on the `code-classroom` branch only). Upstream’s npmjs release workflow (`.github/workflows/publish.yml`) is disabled on this fork.
+
 ## What's in this repository?
 
 The `packages` directory in this repository contains:

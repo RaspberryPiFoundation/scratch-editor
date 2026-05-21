@@ -19,6 +19,10 @@ runs:
       # per-package browser list, and Firefox in scratch-render is
       # cheap unused weight rather than a correctness problem.
       run: npx playwright install --with-deps chromium firefox
+    - name: Explicitly install Rolldown linux binaries
+      shell: bash
+      run: npm install @rolldown/binding-linux-x64-gnu --no-save --ignore-scripts
+
     - name: Test
       working-directory: ./packages/${{ inputs.package_name }}
       shell: bash
