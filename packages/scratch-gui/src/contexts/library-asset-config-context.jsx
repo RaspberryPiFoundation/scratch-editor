@@ -1,35 +1,33 @@
-import React, {createContext, useContext, useMemo} from 'react';
+import React, {createContext, useMemo} from 'react';
 import PropTypes from 'prop-types';
 
-import {DEFAULT_LIBRARY_ASSET_HOST} from '../lib/library-asset-url.js';
+import {DEFAULT_LIBRARY_ASSET_URL_TEMPLATE} from '../lib/library-asset-url.js';
 
 export const defaultLibraryAssetConfig = {
-    libraryAssetHost: DEFAULT_LIBRARY_ASSET_HOST
+    libraryAssetUrlTemplate: DEFAULT_LIBRARY_ASSET_URL_TEMPLATE
 };
 
 export const LibraryAssetConfigContext = createContext(defaultLibraryAssetConfig);
 
-export const useLibraryAssetConfig = function () {
-    return useContext(LibraryAssetConfigContext);
-};
-
 /**
- * Supplies library asset host for all library modals.
+ * Supplies library asset URL template for all library modals.
  * Values are expected to be fixed for the editor session (set once by the embedder).
  * @param {object} props Component props.
  * @param {React.ReactNode} props.children Child components.
- * @param {string} [props.libraryAssetHost] Base URL for library assets.
+ * @param {string} [props.libraryAssetUrlTemplate] Full URL template with placeholders such as
+ *   `{assetPath}`. When omitted, defaults to DEFAULT_LIBRARY_ASSET_URL_TEMPLATE
+ *   (`https://cdn.assets.scratch.mit.edu/internalapi/asset/{assetPath}/get/`).
  * @returns {React.ReactElement} Context provider.
  */
 export const LibraryAssetConfigProvider = ({
     children,
-    libraryAssetHost
+    libraryAssetUrlTemplate
 }) => {
     const value = useMemo(
         () => ({
-            libraryAssetHost: libraryAssetHost || DEFAULT_LIBRARY_ASSET_HOST
+            libraryAssetUrlTemplate: libraryAssetUrlTemplate || DEFAULT_LIBRARY_ASSET_URL_TEMPLATE
         }),
-        [libraryAssetHost]
+        [libraryAssetUrlTemplate]
     );
 
     return (
@@ -41,5 +39,5 @@ export const LibraryAssetConfigProvider = ({
 
 LibraryAssetConfigProvider.propTypes = {
     children: PropTypes.node,
-    libraryAssetHost: PropTypes.string
+    libraryAssetUrlTemplate: PropTypes.string
 };

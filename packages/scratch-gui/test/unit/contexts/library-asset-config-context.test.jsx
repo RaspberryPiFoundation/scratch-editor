@@ -2,48 +2,65 @@ import React from 'react';
 import {render, screen} from '@testing-library/react';
 
 import {
-    LibraryAssetConfigProvider,
-    useLibraryAssetConfig
+    LibraryAssetConfigContext,
+    LibraryAssetConfigProvider
 } from '../../../src/contexts/library-asset-config-context.jsx';
-import {DEFAULT_LIBRARY_ASSET_HOST} from '../../../src/lib/library-asset-url';
+import {DEFAULT_LIBRARY_ASSET_URL_TEMPLATE} from '../../../src/lib/library-asset-url';
 
-const ConfigConsumer = () => {
-    const {libraryAssetHost} = useLibraryAssetConfig();
-    return (
-        <div>
-            <span data-testid="host">{libraryAssetHost}</span>
-        </div>
-    );
-};
+const ConfigConsumer = () => (
+    <LibraryAssetConfigContext.Consumer>
+        {({libraryAssetUrlTemplate}) => (
+            <span data-testid="template">{libraryAssetUrlTemplate}</span>
+        )}
+    </LibraryAssetConfigContext.Consumer>
+);
 
 describe('LibraryAssetConfigContext', () => {
     test('consumer uses default config without a provider', () => {
         render(<ConfigConsumer />);
-        expect(screen.getByTestId('host').textContent).toBe(DEFAULT_LIBRARY_ASSET_HOST);
+        expect(screen.getByTestId('template').textContent).toBe(
+            DEFAULT_LIBRARY_ASSET_URL_TEMPLATE
+        );
     });
 
-    test('provider supplies custom host', () => {
+    test('provider supplies custom URL template', () => {
         render(
             <LibraryAssetConfigProvider
-                libraryAssetHost="http://localhost:3009/api/scratch/assets"
+                libraryAssetUrlTemplate="https://cdn.example.com/assets/{assetPath}"
             >
                 <ConfigConsumer />
             </LibraryAssetConfigProvider>
         );
-        expect(screen.getByTestId('host').textContent).toBe(
-            'http://localhost:3009/api/scratch/assets'
+        expect(screen.getByTestId('template').textContent).toBe(
+            'https://cdn.example.com/assets/{assetPath}'
+        );
+    });
+
+    test('provider defaults to MIT template when prop is unset', () => {
+        render(
+            <LibraryAssetConfigProvider>
+                <ConfigConsumer />
+            </LibraryAssetConfigProvider>
+        );
+        expect(screen.getByTestId('template').textContent).toBe(
+            DEFAULT_LIBRARY_ASSET_URL_TEMPLATE
         );
     });
 
     test('provider value reference is stable when props are unchanged', () => {
         const seen = [];
-        const Capture = () => {
-            seen.push(useLibraryAssetConfig());
+        const captureContextValue = function (value) {
+            seen.push(value);
             return null;
         };
+        const Capture = () => (
+            <LibraryAssetConfigContext.Consumer>
+                {captureContextValue}
+            </LibraryAssetConfigContext.Consumer>
+        );
         const {rerender} = render(
             <LibraryAssetConfigProvider
-                libraryAssetHost="https://api.example.com/assets"
+                libraryAssetUrlTemplate="https://api.example.com/{assetPath}"
             >
                 <Capture />
             </LibraryAssetConfigProvider>
@@ -51,7 +68,7 @@ describe('LibraryAssetConfigContext', () => {
         const first = seen[0];
         rerender(
             <LibraryAssetConfigProvider
-                libraryAssetHost="https://api.example.com/assets"
+                libraryAssetUrlTemplate="https://api.example.com/{assetPath}"
             >
                 <Capture />
             </LibraryAssetConfigProvider>

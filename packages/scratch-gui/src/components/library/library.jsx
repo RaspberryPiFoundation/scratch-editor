@@ -91,13 +91,13 @@ const getAssetTypeForFileExtension = function (fileExtension) {
  * Otherwise it'll return just one `imageSource`.
  * @param {object} item - either a library item or one of a library item's costumes.
  *   The latter is used internally as part of processing an animated thumbnail.
- * @param {string} libraryAssetHost - Base URL for library thumbnail assets.
+ * @param {string} libraryAssetUrlTemplate - URL template for library thumbnail assets.
  * @returns {LibraryItem.PropTypes.icons} - an `imageSource` or array of them
  */
-const getItemIcons = function (item, libraryAssetHost) {
+const getItemIcons = function (item, libraryAssetUrlTemplate) {
     const costumes = (item.json && item.json.costumes) || item.costumes;
     if (costumes) {
-        return costumes.map(costume => getItemIcons(costume, libraryAssetHost));
+        return costumes.map(costume => getItemIcons(costume, libraryAssetUrlTemplate));
     }
 
     if (item.rawURL) {
@@ -111,7 +111,7 @@ const getItemIcons = function (item, libraryAssetHost) {
             assetId: item.assetId,
             assetType: getAssetTypeForFileExtension(item.dataFormat),
             assetServiceUri: buildLibraryAssetServiceUri(
-                libraryAssetHost,
+                libraryAssetUrlTemplate,
                 item.assetId,
                 item.dataFormat
             )
@@ -124,7 +124,7 @@ const getItemIcons = function (item, libraryAssetHost) {
         return {
             assetId: assetId,
             assetType: getAssetTypeForFileExtension(fileExtension),
-            assetServiceUri: buildLibraryAssetServiceUri(libraryAssetHost, md5ext)
+            assetServiceUri: buildLibraryAssetServiceUri(libraryAssetUrlTemplate, md5ext)
         };
     }
 };
@@ -283,8 +283,8 @@ class LibraryComponent extends React.Component {
         const key = this.constructKey(data);
         return (
             <LibraryAssetConfigContext.Consumer>
-                {({libraryAssetHost}) => {
-                    const icons = getItemIcons(data, libraryAssetHost);
+                {({libraryAssetUrlTemplate}) => {
+                    const icons = getItemIcons(data, libraryAssetUrlTemplate);
                     return (<LibraryItem
                         bluetoothRequired={data.bluetoothRequired}
                         collaborator={data.collaborator}

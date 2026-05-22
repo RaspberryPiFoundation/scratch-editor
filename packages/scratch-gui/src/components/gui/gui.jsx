@@ -206,7 +206,7 @@ const GUIComponent = props => {
         username,
         userOwnsProject,
         hideTutorialProjects,
-        libraryAssetHost,
+        libraryAssetUrlTemplate,
         vm,
         ...componentProps
     } = omit(props, 'dispatch', 'setPlatform');
@@ -275,7 +275,7 @@ const GUIComponent = props => {
         ) : (
             <ModalFocusProvider>
                 <LibraryAssetConfigProvider
-                    libraryAssetHost={libraryAssetHost}
+                    libraryAssetUrlTemplate={libraryAssetUrlTemplate}
                 >
                     <Box
                         className={styles.pageWrapper}
@@ -625,7 +625,7 @@ GUIComponent.propTypes = {
     isRtl: PropTypes.bool,
     isShared: PropTypes.bool,
     isTotallyNormal: PropTypes.bool,
-    libraryAssetHost: PropTypes.string,
+    libraryAssetUrlTemplate: PropTypes.string,
     loading: PropTypes.bool,
     logo: PropTypes.string,
     manuallySaveThumbnails: PropTypes.bool,
