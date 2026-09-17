@@ -103,7 +103,7 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_VERSION="13.7.3-code-classroom.$(date +'%Y%m%d%H%M%S')"
+          RELEASE_VERSION="15.1.1-code-classroom.$(date +'%Y%m%d%H%M%S')"
           npm version --no-git-tag-version "$RELEASE_VERSION"
           npm publish --access public --tag latest --ignore-scripts
 
