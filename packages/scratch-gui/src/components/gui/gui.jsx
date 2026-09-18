@@ -46,64 +46,64 @@ import DebugModal from '../debug-modal/debug-modal.jsx';
 import {setPlatform} from '../../reducers/platform.js';
 import {setTheme} from '../../reducers/settings.js';
 import {PLATFORM} from '../../lib/platform.js';
+import {MenuRefProvider} from '../../contexts/menu-ref-context.jsx';
 import {ModalFocusProvider} from '../../contexts/modal-focus-context.jsx';
-import {LibraryAssetConfigProvider} from '../../contexts/library-asset-config-context.jsx';
 
 const ariaMessages = defineMessages({
     menuBar: {
         id: 'gui.aria.menuBar',
         defaultMessage: 'Menu topbar',
-        description: 'ARIA label for the top menu bar'
+        description: 'accessibility label for the top menu bar'
     },
     editor: {
         id: 'gui.aria.editor',
         defaultMessage: 'Editor',
-        description: 'ARIA label for the main editor area'
+        description: 'accessibility label for the main editor area'
     },
     tabList: {
         id: 'gui.aria.tabList',
         defaultMessage: 'Tab list',
-        description: 'ARIA label for the editor tab list'
+        description: 'accessibility label for the editor tab list'
     },
     codePanel: {
         id: 'gui.aria.codePanel',
         defaultMessage: 'Code editor panel',
-        description: 'ARIA label for the code editor panel'
+        description: 'accessibility label for the code editor panel'
     },
     costumesPanel: {
         id: 'gui.aria.costumesPanel',
         defaultMessage: 'Costumes editor panel',
-        description: 'ARIA label for the costumes editor panel'
+        description: 'accessibility label for the costumes editor panel'
     },
     backdropsPanel: {
         id: 'gui.aria.backdropsPanel',
         defaultMessage: 'Backdrops editor panel',
-        description: 'ARIA label for the backdrops editor panel'
+        description: 'accessibility label for the backdrops editor panel'
     },
     soundsPanel: {
         id: 'gui.aria.soundsPanel',
         defaultMessage: 'Sounds editor panel',
-        description: 'ARIA label for the sounds editor panel'
+        description: 'accessibility label for the sounds editor panel'
     },
     backpack: {
         id: 'gui.aria.backpack',
         defaultMessage: 'Backpack',
-        description: 'ARIA label for the backpack'
+        description: 'accessibility label for the backpack'
     },
     stageAndTarget: {
         id: 'gui.aria.stageAndTarget',
         defaultMessage: 'Stage and target',
-        description: 'ARIA label for stage and target area'
+        description: 'accessibility label for stage and target area'
     },
     stage: {
         id: 'gui.aria.stage',
         defaultMessage: 'Stage',
-        description: 'ARIA label for the stage'
+        description: 'accessibility label for the stage'
     },
     targetPane: {
         id: 'gui.aria.targetPane',
         defaultMessage: 'Target pane',
-        description: 'ARIA label for the target pane'
+        description: 'accessibility label for the target pane'
     }
 });
 
@@ -115,7 +115,6 @@ const GUIComponent = props => {
     const intl = useIntl();
     const {
         accountMenuOptions,
-        accountNavOpen,
         activeTabIndex,
         alertsVisible,
         authorId,
@@ -166,8 +165,6 @@ const GUIComponent = props => {
         menuBarHidden,
         renderLogin,
         onClickAbout,
-        onClickAccountNav,
-        onCloseAccountNav,
         onLogOut,
         onClickLogin,
         onOpenRegistration,
@@ -204,9 +201,9 @@ const GUIComponent = props => {
         tipsLibraryVisible,
         useExternalPeripheralList,
         username,
+        avatarBadge,
         userOwnsProject,
         hideTutorialProjects,
-        libraryAssetUrlTemplate,
         vm,
         ...componentProps
     } = omit(props, 'dispatch', 'setPlatform');
@@ -274,72 +271,71 @@ const GUIComponent = props => {
             </StageWrapper>
         ) : (
             <ModalFocusProvider>
-                <LibraryAssetConfigProvider
-                    libraryAssetUrlTemplate={libraryAssetUrlTemplate}
+                <Box
+                    className={styles.pageWrapper}
+                    dir={isRtl ? 'rtl' : 'ltr'}
+                    {...componentProps}
                 >
-                    <Box
-                        className={styles.pageWrapper}
-                        dir={isRtl ? 'rtl' : 'ltr'}
-                        {...componentProps}
-                    >
-                        {telemetryModalVisible ? (
-                            <TelemetryModal
-                                isRtl={isRtl}
-                                isTelemetryEnabled={isTelemetryEnabled}
-                                onCancel={onTelemetryModalCancel}
-                                onOptIn={onTelemetryModalOptIn}
-                                onOptOut={onTelemetryModalOptOut}
-                                onRequestClose={onRequestCloseTelemetryModal}
-                                onShowPrivacyPolicy={onShowPrivacyPolicy}
-                            />
-                        ) : null}
-                        {loading ? (
-                            <Loader />
-                        ) : null}
-                        {isCreating ? (
-                            <Loader messageId="gui.loader.creating" />
-                        ) : null}
-                        {isRendererSupported ? null : (
-                            <WebGlModal isRtl={isRtl} />
-                        )}
-                        {tipsLibraryVisible ? (
-                            <TipsLibrary
-                                hideTutorialProjects={hideTutorialProjects}
-                                onTutorialSelect={onTutorialSelect}
-                            />
-                        ) : null}
-                        {cardsVisible ? (
-                            <Cards />
-                        ) : null}
-                        {alertsVisible ? (
-                            <Alerts className={styles.alertsContainer} />
-                        ) : null}
-                        {connectionModalVisible ? (
-                            <ConnectionModal
-                                useExternalPeripheralList={useExternalPeripheralList}
-                                vm={vm}
-                            />
-                        ) : null}
-                        {costumeLibraryVisible ? (
-                            <CostumeLibrary
-                                vm={vm}
-                                onRequestClose={onRequestCloseCostumeLibrary}
-                            />
-                        ) : null}
-                        {<DebugModal
-                            isOpen={debugModalVisible}
-                            onClose={onCloseDebugModal}
-                        />}
-                        {backdropLibraryVisible ? (
-                            <BackdropLibrary
-                                vm={vm}
-                                onRequestClose={onRequestCloseBackdropLibrary}
-                            />
-                        ) : null}
-                        {!menuBarHidden && <MenuBar
+                    {telemetryModalVisible ? (
+                        <TelemetryModal
+                            isRtl={isRtl}
+                            isTelemetryEnabled={isTelemetryEnabled}
+                            onCancel={onTelemetryModalCancel}
+                            onOptIn={onTelemetryModalOptIn}
+                            onOptOut={onTelemetryModalOptOut}
+                            onRequestClose={onRequestCloseTelemetryModal}
+                            onShowPrivacyPolicy={onShowPrivacyPolicy}
+                        />
+                    ) : null}
+                    {loading ? (
+                        <Loader />
+                    ) : null}
+                    {isCreating ? (
+                        <Loader messageId="gui.loader.creating" />
+                    ) : null}
+                    {isRendererSupported ? null : (
+                        <WebGlModal isRtl={isRtl} />
+                    )}
+                    {tipsLibraryVisible ? (
+                        <TipsLibrary
+                            hideTutorialProjects={hideTutorialProjects}
+                            onTutorialSelect={onTutorialSelect}
+                        />
+                    ) : null}
+                    {cardsVisible ? (
+                        <Cards />
+                    ) : null}
+                    {alertsVisible ? (
+                        <Alerts className={styles.alertsContainer} />
+                    ) : null}
+                    {connectionModalVisible ? (
+                        <ConnectionModal
+                            useExternalPeripheralList={useExternalPeripheralList}
+                            vm={vm}
+                        />
+                    ) : null}
+                    {costumeLibraryVisible ? (
+                        <CostumeLibrary
+                            vm={vm}
+                            onRequestClose={onRequestCloseCostumeLibrary}
+                        />
+                    ) : null}
+                    {<DebugModal
+                        isOpen={debugModalVisible}
+                        onClose={onCloseDebugModal}
+                    />}
+                    {backdropLibraryVisible ? (
+                        <BackdropLibrary
+                            vm={vm}
+                            onRequestClose={onRequestCloseBackdropLibrary}
+                        />
+                    ) : null}
+                    {/* TODO - in case of moving MenuRefProvider which seems likely,
+                    make sure to move it from tests as well */}
+                    {!menuBarHidden && <MenuRefProvider>
+                        <MenuBar
                             ariaRole="banner"
                             ariaLabel={intl.formatMessage(ariaMessages.menuBar)}
-                            accountNavOpen={accountNavOpen}
                             authorId={authorId}
                             authorThumbnailUrl={authorThumbnailUrl}
                             authorUsername={authorUsername}
@@ -363,9 +359,7 @@ const GUIComponent = props => {
                             renderLogin={renderLogin}
                             showComingSoon={showComingSoon}
                             onClickAbout={onClickAbout}
-                            onClickAccountNav={onClickAccountNav}
                             onClickLogo={onClickLogo}
-                            onCloseAccountNav={onCloseAccountNav}
                             onLogOut={onLogOut}
                             onClickLogin={onClickLogin}
                             onOpenRegistration={onOpenRegistration}
@@ -376,215 +370,215 @@ const GUIComponent = props => {
                             onToggleLoginOpen={onToggleLoginOpen}
                             userOwnsProject={userOwnsProject}
                             username={username}
+                            avatarBadge={avatarBadge}
                             accountMenuOptions={accountMenuOptions}
-                        />}
-                        <Box className={classNames(boxStyles, styles.flexWrapper)}>
-                            <Box
-                                role="main"
-                                aria-label={intl.formatMessage(ariaMessages.editor)}
-                                className={styles.editorWrapper}
-                                element="main"
-                            >
-                                <Tabs
-                                    forceRenderTabPanel
-                                    className={tabClassNames.tabs}
-                                    selectedIndex={activeTabIndex}
-                                    selectedTabClassName={tabClassNames.tabSelected}
-                                    selectedTabPanelClassName={tabClassNames.tabPanelSelected}
-                                    onSelect={onActivateTab}
+                        />
+                    </MenuRefProvider>
+                    }
+                    <Box className={classNames(boxStyles, styles.flexWrapper)}>
+                        <Box
+                            role="main"
+                            aria-label={intl.formatMessage(ariaMessages.editor)}
+                            className={styles.editorWrapper}
+                            element="main"
+                        >
+                            <Tabs
+                                forceRenderTabPanel
+                                className={tabClassNames.tabs}
+                                selectedIndex={activeTabIndex}
+                                selectedTabClassName={tabClassNames.tabSelected}
+                                selectedTabPanelClassName={tabClassNames.tabPanelSelected}
+                                onSelect={onActivateTab}
 
-                                    // TODO: focusTabOnClick should be true for accessibility, but currently conflicts
-                                    // with nudge operations in the paint editor. We'll likely need to manage focus
-                                    // differently within the paint editor before we can turn this back on.
-                                    // Repro steps:
-                                    // 1. Click the Costumes tab
-                                    // 2. Select something in the paint editor (say, the cat's face)
-                                    // 3. Press the left or right arrow key
-                                    // Desired behavior: the face should nudge left or right
-                                    // Actual behavior: the Code or Sounds tab is now focused
-                                    focusTabOnClick={false}
+                                // TODO: focusTabOnClick should be true for accessibility, but currently conflicts
+                                // with nudge operations in the paint editor. We'll likely need to manage focus
+                                // differently within the paint editor before we can turn this back on.
+                                // Repro steps:
+                                // 1. Click the Costumes tab
+                                // 2. Select something in the paint editor (say, the cat's face)
+                                // 3. Press the left or right arrow key
+                                // Desired behavior: the face should nudge left or right
+                                // Actual behavior: the Code or Sounds tab is now focused
+                                focusTabOnClick={false}
+                            >
+                                <Box
+                                    role="region"
+                                    aria-label={intl.formatMessage(ariaMessages.tabList)}
+                                >
+                                    <TabList
+                                        className={tabClassNames.tabList}
+                                        role="tablist"
+                                    >
+                                        <Tab
+                                            className={tabClassNames.tab}
+                                            tabIndex="0"
+                                            role="tab"
+                                        >
+                                            <img
+                                                draggable={false}
+                                                src={codeIcon}
+                                            />
+                                            <FormattedMessage
+                                                defaultMessage="Code"
+                                                description="Button to get to the code panel"
+                                                id="gui.gui.codeTab"
+                                            />
+                                        </Tab>
+                                        <Tab
+                                            className={tabClassNames.tab}
+                                            onClick={onActivateCostumesTab}
+                                            role="tab"
+                                            tabIndex="0"
+                                        >
+                                            <img
+                                                draggable={false}
+                                                src={costumesIcon}
+                                            />
+                                            {targetIsStage ? (
+                                                <FormattedMessage
+                                                    defaultMessage="Backdrops"
+                                                    description="Button to get to the backdrops panel"
+                                                    id="gui.gui.backdropsTab"
+                                                />
+                                            ) : (
+                                                <FormattedMessage
+                                                    defaultMessage="Costumes"
+                                                    description="Button to get to the costumes panel"
+                                                    id="gui.gui.costumesTab"
+                                                />
+                                            )}
+                                        </Tab>
+                                        <Tab
+                                            className={tabClassNames.tab}
+                                            onClick={onActivateSoundsTab}
+                                            role="tab"
+                                            tabIndex="0"
+                                        >
+                                            <img
+                                                draggable={false}
+                                                src={soundsIcon}
+                                            />
+                                            <FormattedMessage
+                                                defaultMessage="Sounds"
+                                                description="Button to get to the sounds panel"
+                                                id="gui.gui.soundsTab"
+                                            />
+                                        </Tab>
+                                    </TabList>
+                                </Box>
+                                <TabPanel
+                                    className={tabClassNames.tabPanel}
+                                    role="tabpanel"
                                 >
                                     <Box
+                                        className={styles.blocksWrapper}
                                         role="region"
-                                        aria-label={intl.formatMessage(ariaMessages.tabList)}
+                                        aria-label={intl.formatMessage(ariaMessages.codePanel)}
+                                        element="section"
                                     >
-                                        <TabList
-                                            className={tabClassNames.tabList}
-                                            role="tablist"
-                                        >
-                                            <Tab
-                                                className={tabClassNames.tab}
-                                                tabIndex="0"
-                                                role="tab"
-                                            >
-                                                <img
-                                                    draggable={false}
-                                                    src={codeIcon}
-                                                />
-                                                <FormattedMessage
-                                                    defaultMessage="Code"
-                                                    description="Button to get to the code panel"
-                                                    id="gui.gui.codeTab"
-                                                />
-                                            </Tab>
-                                            <Tab
-                                                className={tabClassNames.tab}
-                                                onClick={onActivateCostumesTab}
-                                                role="tab"
-                                                tabIndex="0"
-                                            >
-                                                <img
-                                                    draggable={false}
-                                                    src={costumesIcon}
-                                                />
-                                                {targetIsStage ? (
-                                                    <FormattedMessage
-                                                        defaultMessage="Backdrops"
-                                                        description="Button to get to the backdrops panel"
-                                                        id="gui.gui.backdropsTab"
-                                                    />
-                                                ) : (
-                                                    <FormattedMessage
-                                                        defaultMessage="Costumes"
-                                                        description="Button to get to the costumes panel"
-                                                        id="gui.gui.costumesTab"
-                                                    />
-                                                )}
-                                            </Tab>
-                                            <Tab
-                                                className={tabClassNames.tab}
-                                                onClick={onActivateSoundsTab}
-                                                role="tab"
-                                                tabIndex="0"
-                                            >
-                                                <img
-                                                    draggable={false}
-                                                    src={soundsIcon}
-                                                />
-                                                <FormattedMessage
-                                                    defaultMessage="Sounds"
-                                                    description="Button to get to the sounds panel"
-                                                    id="gui.gui.soundsTab"
-                                                />
-                                            </Tab>
-                                        </TabList>
-                                    </Box>
-                                    <TabPanel
-                                        className={tabClassNames.tabPanel}
-                                        role="tabpanel"
-                                    >
-                                        <Box
-                                            className={styles.blocksWrapper}
-                                            role="region"
-                                            aria-label={intl.formatMessage(ariaMessages.codePanel)}
-                                            element="section"
-                                        >
-                                            <Blocks
-                                                key={`${blocksId}/${colorMode}/${theme}`}
-                                                canUseCloud={canUseCloud}
-                                                grow={1}
-                                                isVisible={blocksTabVisible}
-                                                options={{
-                                                    media: `${basePath}static/` +
-                                                        `${colorModeMap[colorMode].blocksMediaFolder}/`
-                                                }}
-                                                stageSize={stageSize}
-                                                theme={theme}
-                                                vm={vm}
-                                                colorMode={colorMode}
-                                            />
-                                        </Box>
-                                        <ExtensionsButton
-                                            intl={intl}
-                                            onExtensionButtonClick={onExtensionButtonClick}
+                                        <Blocks
+                                            key={`${blocksId}/${colorMode}/${theme}`}
+                                            canUseCloud={canUseCloud}
+                                            grow={1}
+                                            isVisible={blocksTabVisible}
+                                            options={{
+                                                media: `${basePath}static/${colorModeMap[colorMode].blocksMediaFolder}/`
+                                            }}
+                                            stageSize={stageSize}
+                                            theme={theme}
+                                            vm={vm}
+                                            colorMode={colorMode}
                                         />
-                                        <Box className={styles.watermark}>
-                                            <Watermark />
-                                        </Box>
-                                    </TabPanel>
-                                    <TabPanel
-                                        className={tabClassNames.tabPanel}
-                                        role="tabpanel"
-                                    >
-                                        {costumesTabVisible ? <CostumeTab
-                                            ariaLabel={targetIsStage ? intl.formatMessage(ariaMessages.backdropsPanel) :
-                                                intl.formatMessage(ariaMessages.costumesPanel)}
+                                    </Box>
+                                    <ExtensionsButton
+                                        intl={intl}
+                                        onExtensionButtonClick={onExtensionButtonClick}
+                                    />
+                                    <Box className={styles.watermark}>
+                                        <Watermark />
+                                    </Box>
+                                </TabPanel>
+                                <TabPanel
+                                    className={tabClassNames.tabPanel}
+                                    role="tabpanel"
+                                >
+                                    {costumesTabVisible ? <CostumeTab
+                                        ariaLabel={targetIsStage ? intl.formatMessage(ariaMessages.backdropsPanel) :
+                                            intl.formatMessage(ariaMessages.costumesPanel)}
+                                        ariaRole="region"
+                                        vm={vm}
+                                        onNewLibraryBackdropClick={onNewLibraryBackdropClick}
+                                        onNewLibraryCostumeClick={onNewLibraryCostumeClick}
+                                    /> : null}
+                                </TabPanel>
+                                <TabPanel
+                                    className={tabClassNames.tabPanel}
+                                    role="tabpanel"
+                                >
+                                    {soundsTabVisible ?
+                                        <SoundTab
+                                            ariaLabel={intl.formatMessage(ariaMessages.soundsPanel)}
                                             ariaRole="region"
                                             vm={vm}
-                                            onNewLibraryBackdropClick={onNewLibraryBackdropClick}
-                                            onNewLibraryCostumeClick={onNewLibraryCostumeClick}
                                         /> : null}
-                                    </TabPanel>
-                                    <TabPanel
-                                        className={tabClassNames.tabPanel}
-                                        role="tabpanel"
-                                    >
-                                        {soundsTabVisible ?
-                                            <SoundTab
-                                                ariaLabel={intl.formatMessage(ariaMessages.soundsPanel)}
-                                                ariaRole="region"
-                                                vm={vm}
-                                            /> : null}
-                                    </TabPanel>
-                                </Tabs>
-                                {backpackVisible && backpackConfigured ? (
-                                    <Backpack
-                                        host={backpackHost}
-                                        ariaRole="region"
-                                        ariaLabel={intl.formatMessage(ariaMessages.backpack)}
-                                    />
-                                ) : null}
-                            </Box>
+                                </TabPanel>
+                            </Tabs>
+                            {backpackVisible && backpackConfigured ? (
+                                <Backpack
+                                    host={backpackHost}
+                                    ariaRole="region"
+                                    ariaLabel={intl.formatMessage(ariaMessages.backpack)}
+                                />
+                            ) : null}
+                        </Box>
 
+                        <Box
+                            role="complementary"
+                            aria-label={intl.formatMessage(ariaMessages.stageAndTarget)}
+                            className={classNames(styles.stageAndTargetWrapper, styles[stageSize])}
+                            element="aside"
+                        >
+                            <StageWrapper
+                                isFullScreen={isFullScreen}
+                                isRendererSupported={isRendererSupported}
+                                isRtl={isRtl}
+                                isCreating={isCreating}
+                                stageSize={stageSize}
+                                vm={vm}
+                                ariaRole="region"
+                                ariaLabel={intl.formatMessage(ariaMessages.stage)}
+                                manuallySaveThumbnails={manuallySaveThumbnails}
+                                onSetManualThumbnail={onSetManualThumbnail}
+                                onSetManualThumbnailButtonClick={onSetManualThumbnailButtonClick}
+                                loading={loading}
+                                showNewFeatureCallouts={showNewFeatureCallouts}
+                                userOwnsProject={userOwnsProject}
+                                username={username}
+                                onUpdateProjectThumbnail={onUpdateProjectThumbnail}
+                            />
                             <Box
-                                role="complementary"
-                                aria-label={intl.formatMessage(ariaMessages.stageAndTarget)}
-                                className={classNames(styles.stageAndTargetWrapper, styles[stageSize])}
-                                element="aside"
+                                className={styles.targetWrapper}
+                                role="region"
+                                aria-label={intl.formatMessage(ariaMessages.targetPane)}
+                                element="section"
                             >
-                                <StageWrapper
-                                    isFullScreen={isFullScreen}
-                                    isRendererSupported={isRendererSupported}
-                                    isRtl={isRtl}
-                                    isCreating={isCreating}
+                                <TargetPane
                                     stageSize={stageSize}
                                     vm={vm}
-                                    ariaRole="region"
-                                    ariaLabel={intl.formatMessage(ariaMessages.stage)}
-                                    manuallySaveThumbnails={manuallySaveThumbnails}
-                                    onSetManualThumbnail={onSetManualThumbnail}
-                                    onSetManualThumbnailButtonClick={onSetManualThumbnailButtonClick}
-                                    loading={loading}
-                                    showNewFeatureCallouts={showNewFeatureCallouts}
-                                    userOwnsProject={userOwnsProject}
-                                    username={username}
-                                    onUpdateProjectThumbnail={onUpdateProjectThumbnail}
+                                    onNewSpriteClick={onNewSpriteClick}
+                                    onNewBackdropClick={onNewLibraryBackdropClick}
                                 />
-                                <Box
-                                    className={styles.targetWrapper}
-                                    role="region"
-                                    aria-label={intl.formatMessage(ariaMessages.targetPane)}
-                                    element="section"
-                                >
-                                    <TargetPane
-                                        stageSize={stageSize}
-                                        vm={vm}
-                                        onNewSpriteClick={onNewSpriteClick}
-                                        onNewBackdropClick={onNewLibraryBackdropClick}
-                                    />
-                                </Box>
                             </Box>
                         </Box>
-                        <DragLayer />
                     </Box>
-                </LibraryAssetConfigProvider>
+                    <DragLayer />
+                </Box>
             </ModalFocusProvider>
         );
     }}</MediaQuery>);
 };
 
 GUIComponent.propTypes = {
-    accountNavOpen: PropTypes.bool,
     accountMenuOptions: AccountMenuOptionsPropTypes,
     activeTabIndex: PropTypes.number,
     authorId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]), // can be false
@@ -625,7 +619,6 @@ GUIComponent.propTypes = {
     isRtl: PropTypes.bool,
     isShared: PropTypes.bool,
     isTotallyNormal: PropTypes.bool,
-    libraryAssetUrlTemplate: PropTypes.string,
     loading: PropTypes.bool,
     logo: PropTypes.string,
     manuallySaveThumbnails: PropTypes.bool,
@@ -635,9 +628,7 @@ GUIComponent.propTypes = {
     onActivateCostumesTab: PropTypes.func,
     onActivateSoundsTab: PropTypes.func,
     onActivateTab: PropTypes.func,
-    onClickAccountNav: PropTypes.func,
     onClickLogo: PropTypes.func,
-    onCloseAccountNav: PropTypes.func,
     onExtensionButtonClick: PropTypes.func,
     onLogOut: PropTypes.func,
     onNewSpriteClick: PropTypes.func,
@@ -673,6 +664,7 @@ GUIComponent.propTypes = {
     tipsLibraryVisible: PropTypes.bool,
     useExternalPeripheralList: PropTypes.bool, // true for CDM, false for normal Scratch Link
     username: PropTypes.string,
+    avatarBadge: PropTypes.number,
     userOwnsProject: PropTypes.bool,
     hideTutorialProjects: PropTypes.bool,
     vm: PropTypes.instanceOf(VM).isRequired

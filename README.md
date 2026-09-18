@@ -17,7 +17,7 @@ This repository is a public fork of [scratchfoundation/scratch-editor](https://g
 | | |
 |---|---|
 | **Upstream anchor branch** | [`code-classroom-base`](https://github.com/RaspberryPiFoundation/scratch-editor/tree/code-classroom-base) — points at a [scratchfoundation/scratch-editor](https://github.com/scratchfoundation/scratch-editor) **release tag** only (no RPF packaging) |
-| **Upstream release** | [`v13.7.3`](https://github.com/scratchfoundation/scratch-editor/releases/tag/v13.7.3) (current tag on `code-classroom-base`) |
+| **Upstream release** | [`v15.1.1`](https://github.com/scratchfoundation/scratch-editor/releases/tag/v15.1.1) (current tag on `code-classroom-base`) |
 | **Integration branch** | [`code-classroom`](https://github.com/RaspberryPiFoundation/scratch-editor/tree/code-classroom) — long-lived branch; RPF packaging, CI, and feature work merge here via PR |
 | **RPF changes (diff)** | [Compare `code-classroom` to `code-classroom-base`](https://github.com/RaspberryPiFoundation/scratch-editor/compare/code-classroom-base...code-classroom) — packaging, CI, and fork-only code |
 | **Published package** | [`@RaspberryPiFoundation/scratch-gui`](https://github.com/RaspberryPiFoundation/scratch-editor/pkgs/npm/scratch-gui) on GitHub Packages |
@@ -64,7 +64,7 @@ npm start   # http://localhost:8601/
 ### CI and publishing
 
 - **Pull requests:** CI runs build and tests; **no** package is published to GitHub Packages.
-- **Push to `code-classroom`:** CI builds and publishes `@RaspberryPiFoundation/scratch-gui` with a version such as `13.7.3-code-classroom.YYYYMMDDHHMMSS`. Pin an explicit version in consumers (e.g. editor-ui); do not rely on floating `latest` in production.
+- **Push to `code-classroom`:** CI builds and publishes `@RaspberryPiFoundation/scratch-gui` with a version such as `15.1.1-code-classroom.YYYYMMDDHHMMSS`. Pin an explicit version in consumers (e.g. editor-ui); do not rely on floating `latest` in production.
 - Publishing is configured in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (inline publish step on the `code-classroom` branch only). Upstream’s npmjs release workflow (`.github/workflows/publish.yml`) is disabled on this fork.
 
 ## What's in this repository?
@@ -73,9 +73,14 @@ The `packages` directory in this repository contains:
 
 - `scratch-gui` provides the buttons, menus, and other elements that you interact with when creating and editing a
   project. It's also the "glue" that brings most of the other modules together at runtime.
+- `scratch-media-lib-scripts` builds (or rebuilds) media libraries for the editor.
+- `scratch-paint` provides a way to draw vector (SVG) or bitmap (PNG) images for costumes and backdrops.
 - `scratch-render` draws backdrops, sprites, and clones on the stage.
+- `scratch-storage` helps load project assets like images and sounds. It also provides `ScratchFetch`, a customized
+  wrapper around `fetch`.
 - `scratch-svg-renderer` processes SVG (vector) images for use with Scratch projects.
 - `scratch-vm` is the virtual machine that runs Scratch projects.
+- `task-herder` manages queues of tasks with throttling and concurrency limits.
 
 _Please add to this list as more packages are migrated to the monorepo._
 

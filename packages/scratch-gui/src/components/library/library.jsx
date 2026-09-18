@@ -11,8 +11,8 @@ import Divider from '../divider/divider.jsx';
 import Filter from '../filter/filter.jsx';
 import TagButton from '../../containers/tag-button.jsx';
 import {legacyConfig} from '../../legacy-config';
-import {buildLibraryAssetServiceUri} from '../../lib/library-asset-url.js';
-import {LibraryAssetConfigContext} from '../../contexts/library-asset-config-context.jsx';
+import {GUIStoragePropType} from '../../gui-config';
+import {buildLibraryAssetUrl} from '../../lib/legacy-library-asset-url';
 import Spinner from '../spinner/spinner.jsx';
 import {CATEGORIES} from '../../../src/lib/libraries/decks/index.jsx';
 
@@ -86,18 +86,35 @@ const getAssetTypeForFileExtension = function (fileExtension) {
 };
 
 /**
+ * Build the URL a library thumbnail is fetched from. Storage implementations decide how
+ * assets are addressed, so the host and the path both come from there. Implementations that
+ * predate `getLibraryAssetUrl` get the public Scratch asset service.
+ * @param {GUIStorage} [storage] - the active storage implementation.
+ * @param {string} assetId - the md5 of the asset.
+ * @param {string} dataFormat - the asset's file extension.
+ * @returns {string} - the URL to fetch the thumbnail from.
+ */
+const getLibraryAssetUrl = function (storage, assetId, dataFormat) {
+    if (!storage || typeof storage.getLibraryAssetUrl !== 'function') {
+        return buildLibraryAssetUrl(assetId, dataFormat);
+    }
+
+    return storage.getLibraryAssetUrl(assetId, dataFormat);
+};
+
+/**
  * Figure out one or more icon(s) for a library item.
  * If it's an animated thumbnail, this will return an array of `imageSource`.
  * Otherwise it'll return just one `imageSource`.
  * @param {object} item - either a library item or one of a library item's costumes.
  *   The latter is used internally as part of processing an animated thumbnail.
- * @param {string} libraryAssetUrlTemplate - URL template for library thumbnail assets.
+ * @param {GUIStorage} [storage] - the active storage implementation.
  * @returns {LibraryItem.PropTypes.icons} - an `imageSource` or array of them
  */
-const getItemIcons = function (item, libraryAssetUrlTemplate) {
+const getItemIcons = function (item, storage) {
     const costumes = (item.json && item.json.costumes) || item.costumes;
     if (costumes) {
-        return costumes.map(costume => getItemIcons(costume, libraryAssetUrlTemplate));
+        return costumes.map(costume => getItemIcons(costume, storage));
     }
 
     if (item.rawURL) {
@@ -110,11 +127,7 @@ const getItemIcons = function (item, libraryAssetUrlTemplate) {
         return {
             assetId: item.assetId,
             assetType: getAssetTypeForFileExtension(item.dataFormat),
-            assetServiceUri: buildLibraryAssetServiceUri(
-                libraryAssetUrlTemplate,
-                item.assetId,
-                item.dataFormat
-            )
+            assetServiceUri: getLibraryAssetUrl(storage, item.assetId, item.dataFormat)
         };
     }
 
@@ -124,7 +137,7 @@ const getItemIcons = function (item, libraryAssetUrlTemplate) {
         return {
             assetId: assetId,
             assetType: getAssetTypeForFileExtension(fileExtension),
-            assetServiceUri: buildLibraryAssetServiceUri(libraryAssetUrlTemplate, md5ext)
+            assetServiceUri: getLibraryAssetUrl(storage, assetId, fileExtension)
         };
     }
 };
@@ -281,34 +294,28 @@ class LibraryComponent extends React.Component {
     }
     renderElement (data) {
         const key = this.constructKey(data);
-        return (
-            <LibraryAssetConfigContext.Consumer>
-                {({libraryAssetUrlTemplate}) => {
-                    const icons = getItemIcons(data, libraryAssetUrlTemplate);
-                    return (<LibraryItem
-                        bluetoothRequired={data.bluetoothRequired}
-                        collaborator={data.collaborator}
-                        description={data.description}
-                        disabled={data.disabled}
-                        extensionId={data.extensionId}
-                        featured={data.featured}
-                        hidden={data.hidden}
-                        icons={icons}
-                        id={key}
-                        insetIconURL={data.insetIconURL}
-                        internetConnectionRequired={data.internetConnectionRequired}
-                        isPlaying={this.state.playingItem === key}
-                        key={key}
-                        name={data.name}
-                        showPlayButton={this.props.showPlayButton}
-                        onMouseEnter={this.handleMouseEnter}
-                        onMouseLeave={this.handleMouseLeave}
-                        onSelect={this.handleSelect}
-                        isMemberOnly={data.isMemberOnly}
-                    />);
-                }}
-            </LibraryAssetConfigContext.Consumer>
-        );
+        const icons = getItemIcons(data, this.props.storage);
+        return (<LibraryItem
+            bluetoothRequired={data.bluetoothRequired}
+            collaborator={data.collaborator}
+            description={data.description}
+            disabled={data.disabled}
+            extensionId={data.extensionId}
+            featured={data.featured}
+            hidden={data.hidden}
+            icons={icons}
+            id={key}
+            insetIconURL={data.insetIconURL}
+            internetConnectionRequired={data.internetConnectionRequired}
+            isPlaying={this.state.playingItem === key}
+            key={key}
+            name={data.name}
+            showPlayButton={this.props.showPlayButton}
+            onMouseEnter={this.handleMouseEnter}
+            onMouseLeave={this.handleMouseLeave}
+            onSelect={this.handleSelect}
+            isMemberOnly={data.isMemberOnly}
+        />);
     }
     renderData (data) {
         if (this.state.selectedTag !== ALL_TAG.tag || !this.props.withCategories) {
@@ -394,6 +401,7 @@ class LibraryComponent extends React.Component {
                         [styles.withFilterBar]: this.props.filterable || this.props.tags
                     })}
                     ref={this.setFilteredDataRef}
+                    tabIndex={-1}
                 >
                     {this.state.loaded ? this.renderData(this.getFilteredData()) : (
                         <div className={styles.spinnerWrapper}>
@@ -434,6 +442,7 @@ LibraryComponent.propTypes = {
     onRequestClose: PropTypes.func,
     setStopHandler: PropTypes.func,
     showPlayButton: PropTypes.bool,
+    storage: GUIStoragePropType,
     tags: PropTypes.arrayOf(PropTypes.shape(TagButton.propTypes)),
     title: PropTypes.string.isRequired
 };
